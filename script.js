@@ -116,22 +116,7 @@ function listMovable(newBoard) {
         if (newBoard[i] !== empty) {
             continue;
         }
-        /*
-        for (let j = 0; j < 8; j++) {
-            const d = directions[j];
-            let next = i + d;
-            if (newBoard[next] !== opponent(color)) {
-                continue;
-            }
-            next += d;
-            while (newBoard[next] === opponent(color)) {
-                next += d;
-            }
-            if (newBoard[next] === color) {
-                movable.push(i);
-                break;
-            }
-        }*/
+        movable.push(i);
     }
     return movable;
 }
@@ -144,22 +129,6 @@ function existsMovable(newBoard) {
             continue;
         }
         return true;
-        /*
-        for (let j = 0; j < 8; j++) {
-            const d = directions[j];
-            let next = i + d;
-            if (newBoard[next] !== opponent(color)) {
-                continue;
-            }
-            next += d;
-            while (newBoard[next] === opponent(color)) {
-                next += d;
-            }
-            if (newBoard[next] === color) {
-                return true;
-            }
-        }
-    */
     }
     return false;
 }
