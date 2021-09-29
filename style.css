@@ -1,0 +1,45 @@
+body {
+    text-align: center;
+}
+
+p {
+    font-size: 2rem;
+}
+
+div#board table {
+    margin: 0 auto;
+    background: black;
+}
+
+div#board td {
+    background: #008800;
+    height: 3rem;
+    width: 3rem;
+    font-size: 2rem;
+    font-family: monospace;
+}
+
+div#board td.wall{
+    background: #888888;
+    height: 3rem;
+    width: 3rem;
+    font-size: 2rem;
+    font-family: monospace;
+}
+
+
+div#board .white::before {
+    content: "●";
+}
+
+div#board .black::before {
+    content: "●";
+}
+
+div#board .white {
+    color: white;
+}
+
+div#board .black {
+    color: black;
+}
