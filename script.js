@@ -1,5 +1,10 @@
 const black = 1, white = -1, empty = 0, wall = 2, end = 0;
 
+const bord_full = 64;
+const teban = bord_full+1;
+const black_num = bord_full+2;
+const white_num = bord_full + 3;
+
 function colorString(color) {
     if (color === 1) {
         return 'black';
@@ -21,7 +26,7 @@ for (let i = 0; i < 19; i++) {
         const boardCell = document.createElement('td');
         boardLine.appendChild(boardCell);
         boardCell.addEventListener('click', makeMove);
-        boardCell.setAttribute('id', 4 * di + j + 10);
+        boardCell.setAttribute('id', 4 * di + j );
     }
     di=di+1
     }
@@ -37,53 +42,41 @@ for (let i = 0; i < 19; i++) {
 
 // 初期盤面の作成
 let board = [];
-for (let i = 0; i < 91; i++) {
-    if (i < 10 || 80 < i || i % 9 === 0) {
-        //board.push(wall);
-        board.push(wall);
-    } else if (i === 40 || i === 50) {
-        board.push(empty);
-        //board.push(white);
-        //document.getElementById(i).setAttribute('class', 'white');
-    } else if (i === 41 || i === 49) {
-        board.push(empty);
-        //board.push(black);
-        //document.getElementById(i).setAttribute('class', 'black');
-    } else {
-        board.push(empty);
-    }
+for (let i = 0; i < bord_full; i++) {
+    board.push(empty);
 }
+board.push(0);
 board.push(black);
-board.push(2);
-board.push(2);
+board.push(0);
+board.push(0);
 
 const directions = [-10, -9, -8, -1, 1, 8, 9, 10];
 
 // 手番の色を取得
 function getColor(newBoard) {
-    return newBoard[91];
+    return newBoard[teban];
 }
 
 // 相手番
 function changeColor(newBoard) {
-    newBoard[91] = opponent(newBoard[91]);
+    newBoard[teban] = opponent(newBoard[teban]);
 }
 
 function addStone(newBoard, color) {
     if (color === black) {
-        newBoard[92]++;
+        newBoard[black_num]++;
     } else {
-        newBoard[93]++;
+        newBoard[white_num]++;
     }
 }
 
 function flipStone(newBoard, color) {
     if (color === black) {
-        newBoard[92]++;
-        newBoard[93]--;
+        newBoard[black_num]++;
+        newBoard[white_num]--;
     } else {
-        newBoard[93]++;
-        newBoard[92]--;
+        newBoard[white_num]++;
+        newBoard[black_num]--;
     }
 }
 
@@ -112,7 +105,7 @@ function opponent(color) {
 function listMovable(newBoard) {
     let movable = [];
     const color = getColor(newBoard);
-    for (let i = 10; i <= 80; i++) {
+    for (let i = 0; i <= bord_full; i++) {
         if (newBoard[i] !== empty) {
             continue;
         }
@@ -124,7 +117,7 @@ function listMovable(newBoard) {
 // 打てる場所があるか
 function existsMovable(newBoard) {
     const color = getColor(newBoard);
-    for (let i = 10; i <= 80; i++) {
+    for (let i = 0; i <= bord_full; i++) {
         if (newBoard[i] !== empty) {
             continue;
         }
@@ -165,7 +158,7 @@ function move(idx) {
     
     if (movable) {
         flip(idx);
-        document.getElementById('countBlack').textContent = board[92];
+        document.getElementById('countBlack').textContent = board[black_num];
         document.getElementById('countWhite').textContent = board[93];
         changeColor(board);
         const color = getColor(board);
@@ -235,10 +228,14 @@ function afterMove(oldBoard, idx) {
 
 // 黒番から見た評価値
 function evalBoard(newBoard) {
-    return 0
+    min = Math.ceil(0);
+    max = Math.floor(10000);
+    return Math.floor(Math.random() * (max - min) + min); 
+    
+
     let res = Math.random();
     if (getColor(newBoard) === end) {
-        res = newBoard[92] - newBoard[93];
+        res = newBoard[black_num ] - newBoard[white_num];
         if (res > 0) {
             res = 64 - 2 * newBoard[93];
         } else if (res < 0) {
@@ -436,4 +433,3 @@ function human(color) {
 if (getColor(board) !== end && !human(getColor(board))) {
     move(moveByAI(defaultDepth));
 }
-
