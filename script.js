@@ -304,11 +304,22 @@ function evalBoard(newBoard) {
 }
 
 function moveByAI(depth) {
-    let movable = listMovable(board), res, maxScore = -64000;
+    let movable = listMovable(board)
+    min = Math.ceil(0);
+    max = Math.floor(movable.length-1);
+    ret = Math.floor(Math.random() * (max - min) + min);
+    //return movable[0]
+    console.log(ret)
+    let nii=0
+    maxScore = -64000;
     const color = getColor(board);
     let newBoards = {}, evals = {};
     for (const idx of movable) {
-        return idx
+        if(nii == ret){
+            return idx
+        }
+        nii+=1
+        continue
         newBoards[idx] = afterMove(board, idx);
         evals[idx] = search(newBoards[idx], 0, color, -64000, 64000);
     }
