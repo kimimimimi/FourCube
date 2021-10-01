@@ -137,29 +137,12 @@ function makeMove() {
 function move(idx) {
     const color = getColor(board);
     if (board[idx] !== empty) return;
-    
     let movable = true;
-    /*
-    for (let i = 0; i < 8; i++) {
-        const d = directions[i];
-        let next = idx + d;
-        while (board[next] === opponent(color)) {
-            next += d;
-        }
-        if (board[next] === color) {
-            next -= d;
-            while (board[next] === opponent(color)) {
-                flip(next);
-                movable = true;
-                next -= d;
-            }
-        }
-    }*/
     
     if (movable) {
         flip(idx);
         document.getElementById('countBlack').textContent = board[black_num];
-        document.getElementById('countWhite').textContent = board[93];
+        document.getElementById('countWhite').textContent = board[white_num];
         changeColor(board);
         const color = getColor(board);
         if (existsMovable(board)) {
