@@ -126,18 +126,92 @@ function existsMovable(newBoard) {
     return false;
 }
 
+function check_1d(board, color,d1,d2,d3) {
+    for(let i = 0; i < 4; i++){
+    for(let j = 0; j < 4; j++){
+    let is_ok=true;
+    let ret=[]
+    for(let k = 0; k < 4; k++){
+        let pos = i*d1+j*d2+k*d3
+        ret.push(pos)
+        if(board[pos]!=color){
+            is_ok=false
+            break
+        }
+    }
+    if(is_ok){
+        return ret
+    }
+    }
+    }
+    return []
+}
+
+
+
+//どちらかが四つ揃っているか。
+function check_is_end(board, color) {
+    ret =check_1d(board,color,16,4,1)
+    if (ret.length==4){
+        return ret
+    }
+    ret =check_1d(board,color,4,1,16)
+    if (ret.length==4){
+        return ret
+    }
+    ret =check_1d(board,color,1,16,4)
+    if (ret.length==4){
+        return ret
+    }
+
+
+    return []
+}
+
 // クリック時の動作
 function makeMove() {
     const idx = Number(this.getAttribute('id'));
     if (!human(getColor(board)) || board[idx] !== empty) return;
     move(idx);
+    const ret = check_is_end(board, black);
+    if (ret.length==4){
+        console.log(ret)
+    }
+}
+
+function after_end(ret,board){
+    //操作不能にする
+    for (let idx = 0; idx < bord_full; idx++){
+        if (board[idx] == empty){
+            board[idx] = empty
+        }
+    }
+    //揃ったところの色を変える
+
 }
 
 // 着手
 function move(idx) {
     const color = getColor(board);
     if (board[idx] !== empty) return;
+    
     let movable = true;
+    /*
+    for (let i = 0; i < 8; i++) {
+        const d = directions[i];
+        let next = idx + d;
+        while (board[next] === opponent(color)) {
+            next += d;
+        }
+        if (board[next] === color) {
+            next -= d;
+            while (board[next] === opponent(color)) {
+                flip(next);
+                movable = true;
+                next -= d;
+            }
+        }
+    }*/
     
     if (movable) {
         flip(idx);
