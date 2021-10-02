@@ -14,7 +14,7 @@ function colorString(color) {
 }
 
 
-// オセロ盤の表示
+// 盤の表示
 const boardShow = document.createElement('table');
 document.getElementById('board').appendChild(boardShow);
 let di = 0
@@ -147,6 +147,55 @@ function check_1d(board, color,d1,d2,d3) {
     return []
 }
 
+function check_2d(board, color,d1,d2,d3) {
+    for(let i = 0; i < 4; i++){
+    for(let r of [1,-1]){
+    let is_ok=true;
+    let ret=[]
+    for(let k = 0; k < 4; k++){
+        j= k
+        if (r==-1){j=3-k}
+        let pos = i*d1+j*d2+k*d3
+        ret.push(pos)
+        if(board[pos]!=color){
+            is_ok=false
+            break
+        }
+    }
+    if(is_ok){
+        return ret
+    }
+    }
+    }
+    return []
+}
+
+function check_3d(board, color,d1,d2,d3) {
+    for(let rj of [1,-1]){
+    for(let rk of [1,-1]){
+    let is_ok=true;
+    let ret=[]
+    for(let i = 0; i < 4; i++){
+        j= i
+        if (rj==-1){j=3-i}
+        k = i
+        if (rk==-1){k=3-i}
+        let pos = i*d1+j*d2+k*d3
+        ret.push(pos)
+        if(board[pos]!=color){
+            is_ok=false
+            break
+        }
+    }
+    if(is_ok){
+        return ret
+    }
+    }
+    }
+    return []
+}
+
+
 
 
 //どちらかが四つ揃っているか。
@@ -164,7 +213,22 @@ function check_is_end(board, color) {
         return ret
     }
 
-
+    ret =check_2d(board,color,16,4,1)
+    if (ret.length==4){
+        return ret
+    }
+    ret =check_2d(board,color,4,1,16)
+    if (ret.length==4){
+        return ret
+    }
+    ret =check_2d(board,color,1,16,4)
+    if (ret.length==4){
+        return ret
+    }
+    ret =check_3d(board,color,1,16,4)
+    if (ret.length==4){
+        return ret
+    }
     return []
 }
 
@@ -176,17 +240,25 @@ function makeMove() {
     const ret = check_is_end(board, black);
     if (ret.length==4){
         console.log(ret)
+        after_end(ret,board)
     }
 }
 
 function after_end(ret,board){
     //操作不能にする
-    for (let idx = 0; idx < bord_full; idx++){
+    for (let idx = 0; idx < bord_full; idx++)
+    {
         if (board[idx] == empty){
-            board[idx] = empty
+            board[idx] = wall
         }
     }
     //揃ったところの色を変える
+    for (const idx of ret)
+    {
+        document.getElementById(idx)
+            .style.backgroundColor = 
+            "#ffff00";
+    }
 
 }
 
