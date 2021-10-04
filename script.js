@@ -237,11 +237,14 @@ function makeMove() {
     const idx = Number(this.getAttribute('id'));
     if (!human(getColor(board)) || board[idx] !== empty) return;
     move(idx);
+    
     const ret = check_is_end(board, black);
     if (ret.length==4){
-        console.log(ret)
-        after_end(ret,board)
+        console.log(ret);
+        after_end(ret,board);
     }
+
+    
 }
 
 function after_end(ret,board){
@@ -268,25 +271,11 @@ function move(idx) {
     if (board[idx] !== empty) return;
     
     let movable = true;
-    /*
-    for (let i = 0; i < 8; i++) {
-        const d = directions[i];
-        let next = idx + d;
-        while (board[next] === opponent(color)) {
-            next += d;
-        }
-        if (board[next] === color) {
-            next -= d;
-            while (board[next] === opponent(color)) {
-                flip(next);
-                movable = true;
-                next -= d;
-            }
-        }
-    }*/
+    
     
     if (movable) {
         flip(idx);
+        
         document.getElementById('countBlack').textContent = board[black_num];
         document.getElementById('countWhite').textContent = board[white_num];
         changeColor(board);
@@ -303,6 +292,7 @@ function move(idx) {
                 alert('終局');
             }
         }
+        
         if (getColor(board) !== end && !human(getColor(board))) {
             let countEmpty = 0;
             for (const state of board) {
@@ -310,12 +300,20 @@ function move(idx) {
                     countEmpty++;
                 }
             }
+            
             if (countEmpty <= endgameDepth) {
                 setTimeout(() => move(moveByAI(countEmpty)), 0);
             } else {
                 setTimeout(() => move(moveByAI(defaultDepth)), 0);
             }
         }
+            ret_w = check_is_end(board, white);
+            if (ret_w.length==4){
+                console.log(ret_w);
+                after_end(ret_w, board);
+            }
+
+        
     }
 }
 
