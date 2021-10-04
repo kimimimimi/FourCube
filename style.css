@@ -12,32 +12,31 @@ div#board table {
 }
 
 div#board td {
-    background: #008800;
+    background: #00bb00;
     height: 3rem;
     width: 3rem;
-    font-size: 2rem;
+    font-size: 3rem;
     font-family: monospace;
 }
 
 div#board td.wall{
-    background: #888888;
-    height: 3rem;
+    background: #333333;
+    height: 1rem;
     width: 3rem;
     font-size: 2rem;
     font-family: monospace;
 }
 
-
 div#board .white::before {
-    content: "●";
+    content: "x";
 }
 
 div#board .black::before {
-    content: "●";
+    content: "o";
 }
 
 div#board .white {
-    color: white;
+    color: black;
 }
 
 div#board .black {
