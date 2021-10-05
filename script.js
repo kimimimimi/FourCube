@@ -262,6 +262,14 @@ function after_end(ret,board){
             .style.backgroundColor = 
             "#ffff00";
     }
+    //アラートで勝利宣言をする。
+    if (board[ret[0]]==black){
+        alert('o Win')
+    }else{
+        alert('x Win')
+    }
+    //draw用にendをset
+    board[teban] = end
 
 }
 
@@ -307,13 +315,19 @@ function move(idx) {
                 setTimeout(() => move(moveByAI(defaultDepth)), 0);
             }
         }
-            ret_w = check_is_end(board, white);
-            if (ret_w.length==4){
-                console.log(ret_w);
-                after_end(ret_w, board);
-            }
+        ret_w = check_is_end(board, white);
+        if (ret_w.length==4){
+            console.log(ret_w);
+            after_end(ret_w, board);
+        }
+        let countEmpty = 0;
+        for (const state of board) {
+            if (state === empty) {countEmpty++;}
+        }
 
-        
+        if(countEmpty == 1 && getColor(board) !== end){
+            alert('Draw')
+        }
     }
 }
 
