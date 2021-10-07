@@ -243,8 +243,6 @@ function makeMove() {
         console.log(ret);
         after_end(ret,board);
     }
-
-    
 }
 
 function after_end(ret,board){
@@ -369,124 +367,51 @@ function afterMove(oldBoard, idx) {
 
 // 黒番から見た評価値
 function evalBoard(newBoard) {
-    min = Math.ceil(0);
-    max = Math.floor(10000);
-    return Math.floor(Math.random() * (max - min) + min); 
+    const method=2
+    //乱数の値を返す。
+    if (method==0){
+        min = Math.ceil(0);
+        max = Math.floor(10000);
+        ret = Math.floor(Math.random() * (max - min) + min);
+        return ret
+    }
+    if (method==1){
+        return 0;
+    }
     
-
-    let res = Math.random();
-    if (getColor(newBoard) === end) {
-        res = newBoard[black_num ] - newBoard[white_num];
-        if (res > 0) {
-            res = 64 - 2 * newBoard[93];
-        } else if (res < 0) {
-            res = 2 * newBoard[92] - 64;
-        }
-        return 1000 * res;
-    }
-    for (let i = 20; i <= 70; i++) {
-        if (Math.abs(newBoard[i]) !== 1 || (i + 1) % 9 < 3) {
-            continue;
-        }
-        let value = 0;
-        for (let j = 0; j < 8; j++) {
-            const d = directions[j];
-            if (newBoard[i + d] === empty) {
-                value--;
-            }
-        }
-        res += value * newBoard[i];
-    }
-    // 隅
-    const corner = [10, 17, 73, 80];
-    for (let i = 0; i < corner.length; i++) {
-        for (let j = i + 1; j < corner.length; j++) {
-            const d = (corner[j] - corner[i]) / 7;
-            if (i + j === 3) { // Xライン
-                if (newBoard[corner[i]] === empty) {
-                    res -= 6 * newBoard[corner[i] + d];
-                }
-                if (newBoard[corner[j]] === empty) {
-                    res -= 6 * newBoard[corner[j] - d];
-                }
-                continue;
-            }
-            let value = 0;
-            for (let k = 2; k < 6; k++) {
-                if (newBoard[corner[i] + k * d] === empty) {
-                    value -= 2;
-                }
-            }
-            if (newBoard[corner[i]] === empty) {
-                res += value * newBoard[corner[i] + d];
-            }
-            if (newBoard[corner[j]] === empty) {
-                res += value * newBoard[corner[j] - d];
-            }
-            let noEmpty = true, adjust = 0;
-            for (let k = 0; k < 8; k++) {
-                if (newBoard[corner[i] + k * d] === empty) {
-                    noEmpty = false;
-                    break;
-                }
-                adjust += newBoard[corner[i] + k * d];
-            }
-            const edge = newBoard[corner[i]] + newBoard[corner[j]];
-            if (noEmpty) {
-                res += adjust;
-            } else if (edge > 0) {
-                res += 8;
-            } else if (edge < 0) {
-                res -= 8;
-            }
-        }
-    }
-    return res;
+    var wa = check_is_end(newBoard, white)
+    if(wa.length==4){return 100;}
+    var ba = check_is_end(newBoard, black)
+    if(ba.length==4){return 80;}
+    return Math.random();
 }
 
 function moveByAI(depth) {
-    let movable = listMovable(board)
+    let movable = listMovable(board);
     min = Math.ceil(0);
     max = Math.floor(movable.length-1);
     ret = Math.floor(Math.random() * (max - min) + min);
-    //return movable[0]
-    console.log(ret)
-    let nii=0
-    maxScore = -64000;
+    console.log(ret);
+    
     const color = getColor(board);
     let newBoards = {}, evals = {};
     for (const idx of movable) {
-        if(nii == ret){
-            return idx
-        }
-        nii+=1
-        continue
-        newBoards[idx] = afterMove(board, idx);
-        evals[idx] = search(newBoards[idx], 0, color, -64000, 64000);
+        var bwaaa = board.slice();
+        bwaaa[idx] = white;
+        var bbaaa = board.slice();
+        bbaaa[idx] = black;
+        evals[idx] = Math.max(evalBoard(bwaaa),evalBoard(bbaaa));
     }
     movable.sort(function (a, b) {
         return evals[b] - evals[a];
     })
-    let first = true;
     for (const idx of movable) {
-        const newBoard = newBoards[idx];
-        let eval;
-        if (first) {
-            eval = search(newBoard, depth - 1, color, -64000, 64000);
-            first = false;
-        } else {
-            eval = search(newBoard, depth - 1, color, maxScore, maxScore + 1);
-            if (eval >= maxScore + 1) {
-                eval = search(newBoard, depth - 1, color, eval, 64000);
-            }
-        }
-        if (eval > maxScore) {
-            res = idx;
-            maxScore = eval;
-        }
+        return idx
     }
     return res;
 }
+
+/*
 
 // 前の着手から見た評価値、α以下もしくはβ以上が確定したら枝刈り
 function search(currentBoard, depth, prevColor, alpha, beta) {
@@ -569,7 +494,7 @@ function search(currentBoard, depth, prevColor, alpha, beta) {
         eval *= -1;
     }
     return eval;
-}
+}*/
 
 const defaultDepth = 8;
 const endgameDepth = 14;
