@@ -105,7 +105,7 @@ function opponent(color) {
 function listMovable(newBoard) {
     let movable = [];
     const color = getColor(newBoard);
-    for (let i = 0; i <= bord_full; i++) {
+    for (let i = 0; i < bord_full; i++) {
         if (newBoard[i] !== empty) {
             continue;
         }
