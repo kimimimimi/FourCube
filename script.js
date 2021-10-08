@@ -82,6 +82,7 @@ function flipStone(newBoard, color) {
 
 // 表示を含めて石を返す
 function flip(idx) {
+    console.log(idx,11122)
     const color = getColor(board);
     if (board[idx] === empty) {
         addStone(board, color);
@@ -126,28 +127,21 @@ function existsMovable(newBoard) {
     return false;
 }
 
-function check_1d(board, color,d1,d2,d3) {
+function check_1d(board, color,d1,d2,d3,ret) {
     for(let i = 0; i < 4; i++){
     for(let j = 0; j < 4; j++){
     let is_ok=true;
-    let ret=[]
+    let temp=[]
     for(let k = 0; k < 4; k++){
         let pos = i*d1+j*d2+k*d3
-        ret.push(pos)
-        if(board[pos]!=color){
-            is_ok=false
-            break
-        }
+        temp.push(pos)
     }
-    if(is_ok){
-        return ret
+    ret.push(temp)
     }
     }
-    }
-    return []
 }
 
-function check_2d(board, color,d1,d2,d3) {
+function check_2d(board, color,d1,d2,d3,check) {
     for(let i = 0; i < 4; i++){
     for(let r of [1,-1]){
     let is_ok=true;
@@ -157,20 +151,13 @@ function check_2d(board, color,d1,d2,d3) {
         if (r==-1){j=3-k}
         let pos = i*d1+j*d2+k*d3
         ret.push(pos)
-        if(board[pos]!=color){
-            is_ok=false
-            break
-        }
     }
-    if(is_ok){
-        return ret
+    check.push(ret)
     }
     }
-    }
-    return []
 }
 
-function check_3d(board, color,d1,d2,d3) {
+function check_3d(board, color,d1,d2,d3,check) {
     for(let rj of [1,-1]){
     for(let rk of [1,-1]){
     let is_ok=true;
@@ -182,54 +169,42 @@ function check_3d(board, color,d1,d2,d3) {
         if (rk==-1){k=3-i}
         let pos = i*d1+j*d2+k*d3
         ret.push(pos)
-        if(board[pos]!=color){
-            is_ok=false
-            break
-        }
     }
-    if(is_ok){
-        return ret
+    check.push(ret)
     }
     }
-    }
-    return []
 }
 
+function make_check_list(){
+    color=0
+    const ret = []
+    check_1d(board,color,16,4,1, ret)
+    check_1d(board,color,4,1,16, ret)
+    check_1d(board,color,1,16,4, ret)
+    check_2d(board,color,16,4,1, ret)
+    check_2d(board,color,4,1,16, ret)
+    check_2d(board,color,1,16,4, ret)
+    check_3d(board,color,1,16,4, ret)
+    console.log(ret.length)
+    return ret
+}
 
-
+const check_list = make_check_list()
+//console.log(check_list)
 
 //どちらかが四つ揃っているか。
 function check_is_end(board, color) {
-    ret =check_1d(board,color,16,4,1)
-    if (ret.length==4){
-        return ret
+    for (let line of check_list){
+        let is_ok=true;
+        for (let idx of line){
+            if (board[idx] != color){
+                is_ok=false
+                break
+            }
+        }
+        if (is_ok){return line;}
     }
-    ret =check_1d(board,color,4,1,16)
-    if (ret.length==4){
-        return ret
-    }
-    ret =check_1d(board,color,1,16,4)
-    if (ret.length==4){
-        return ret
-    }
-
-    ret =check_2d(board,color,16,4,1)
-    if (ret.length==4){
-        return ret
-    }
-    ret =check_2d(board,color,4,1,16)
-    if (ret.length==4){
-        return ret
-    }
-    ret =check_2d(board,color,1,16,4)
-    if (ret.length==4){
-        return ret
-    }
-    ret =check_3d(board,color,1,16,4)
-    if (ret.length==4){
-        return ret
-    }
-    return []
+    return [];
 }
 
 // クリック時の動作
@@ -380,10 +355,10 @@ function evalBoard(newBoard) {
     }
     
     var wa = check_is_end(newBoard, white)
-    if(wa.length==4){return 100;}
+    if(wa.length==4){return -800;}
     var ba = check_is_end(newBoard, black)
-    if(ba.length==4){return 80;}
-    return Math.random();
+    if(ba.length==4){return -800;}
+    return 0;
 }
 
 function moveByAI(depth) {
