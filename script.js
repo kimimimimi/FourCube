@@ -388,10 +388,6 @@ function evalBoard(newBoard) {
 
 function moveByAI(depth) {
     let movable = listMovable(board);
-    min = Math.ceil(0);
-    max = Math.floor(movable.length-1);
-    ret = Math.floor(Math.random() * (max - min) + min);
-    console.log(ret);
     
     const color = getColor(board);
     let newBoards = {}, evals = {};
