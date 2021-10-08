@@ -340,6 +340,26 @@ function afterMove(oldBoard, idx) {
     return newBoard;
 }
 
+function evalLine(newBoard,line) {
+    let ret=0;
+    let color=1;
+    for (let idx of line){
+        let c = newBoard[idx];
+        if (c==white){
+            ret += ret + 1
+            color *= 2
+        }
+        if (c==black){
+            ret += ret + 1
+            color *= 3
+        }
+    }
+    if (color==1){return 0;}
+    if (color%6 == 0){return 0;}
+    if (color%2 == 0){return ret;}
+    return -ret
+}
+
 // 黒番から見た評価値
 function evalBoard(newBoard) {
     const method=2
@@ -354,11 +374,12 @@ function evalBoard(newBoard) {
         return 0;
     }
     
-    var wa = check_is_end(newBoard, white)
-    if(wa.length==4){return -800;}
-    var ba = check_is_end(newBoard, black)
-    if(ba.length==4){return -800;}
-    return 0;
+    let ret = 0
+    for (let line of check_list){
+        ret += evalLine(newBoard,line)
+    }
+    return ret
+
 }
 
 function moveByAI(depth) {
