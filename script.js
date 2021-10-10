@@ -233,7 +233,7 @@ function after_end(ret,board){
     {
         document.getElementById(idx)
             .style.backgroundColor = 
-            "#ffff00";
+            "#aaaa00";
     }
     //アラートで勝利宣言をする。
     if (board[ret[0]]==black){
@@ -392,7 +392,7 @@ function moveByAI(depth) {
         tt[idx]=white
         tt[teban]=black
         //let temp_eval=evalBoard(tt)
-        let temp_eval = search(tt, 1, 1)
+        let temp_eval = search(tt, 2, -1)
         //console.log(idx, temp_eval)
         if (ret_idx ==-1 || ret_eval < temp_eval){
             ret_idx=idx;
@@ -402,6 +402,10 @@ function moveByAI(depth) {
     return ret_idx;
 }
 
+function opp(color){
+    if (color==black){return white;}
+    return black;
+}
 
 // 前の着手から見た評価値、α以下もしくはβ以上が確定したら枝刈り
 function search(currentBoard, depth, fugou) {
@@ -411,17 +415,26 @@ function search(currentBoard, depth, fugou) {
         return fugou*eval;
     }
     
+    let is_end = check_is_end(board, opp(currentBoard[teban]))
+    if (is_end.length==4){
+        return 1000000
+    }
+    is_end = check_is_end(board, (currentBoard[teban]))
+    if (is_end.length==4){
+        return -1000000
+    }
+    
     let movable = listMovable(board);
     let ret_idx = -1;
     let ret_eval= 0;
     for (const idx of movable) {
         let tt = currentBoard.slice();
-        tt[idx]=black;//tt[teban]
-        //if (tt[teban]==white){
-        //    tt[teban]=black;
-        //}else{
-        //    tt[teban]=white;
-        //}
+        tt[idx]=tt[teban]
+        if (tt[teban]==white){
+            tt[teban]=black;
+        }else{
+            tt[teban]=white;
+        }
         let temp_eval = fugou*search(tt, 
             depth-1, fugou*-1)
         if (ret_idx ==-1 || ret_eval < temp_eval){
