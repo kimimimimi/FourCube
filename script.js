@@ -333,29 +333,30 @@ function afterMove(oldBoard, idx) {
         if (!existsMovable(newBoard)) {
             changeColor(newBoard);
             if (!existsMovable(newBoard)) {
-                newBoard[91] = end;
+                newBoard[teban] = end;
             }
         }
     }
     return newBoard;
 }
 
-function evalLine(newBoard,line) {
-    let ret=0;
+function evalLine(newBoard, line) {
+    let ret=1;
     let color=1;
     for (let idx of line){
         let c = newBoard[idx];
         if (c==white){
-            ret += ret + 1
+            ret *=10
             color *= 2
         }
         if (c==black){
-            ret += ret + 1
+            ret *= 10
             color *= 3
         }
     }
     if (color==1){return 0;}
     if (color%6 == 0){return 0;}
+    //if (ret == 15){ret=10000;}
     if (color%2 == 0){return ret;}
     return -ret
 }
@@ -384,31 +385,31 @@ function evalBoard(newBoard) {
 
 function moveByAI(depth) {
     let movable = listMovable(board);
-    
-    const color = getColor(board);
-    let newBoards = {}, evals = {};
+    let ret_idx = -1;
+    let ret_eval= 0;
     for (const idx of movable) {
-        var bwaaa = board.slice();
-        bwaaa[idx] = white;
-        var bbaaa = board.slice();
-        bbaaa[idx] = black;
-        evals[idx] = Math.max(evalBoard(bwaaa),evalBoard(bbaaa));
+        let tt = board.slice();
+        tt[idx]=white
+        let temp_eval=evalBoard(tt)
+        //let temp_eval = search(afterMove(tt, idx), 0, black, 100000, -1000000)
+        console.log(idx, temp_eval)
+        if (ret_idx ==-1 || ret_eval < temp_eval){
+            ret_idx=idx;
+            ret_eval=temp_eval;
+        }
     }
-    movable.sort(function (a, b) {
-        return evals[b] - evals[a];
-    })
-    for (const idx of movable) {
-        return idx
-    }
-    return res;
+    return ret_idx;
 }
 
-/*
 
 // 前の着手から見た評価値、α以下もしくはβ以上が確定したら枝刈り
 function search(currentBoard, depth, prevColor, alpha, beta) {
+    console.log(currentBoard[0])
+    let eval = evalBoard(currentBoard);
+    return eval;
+    
     const color = getColor(currentBoard);
-    let eval = alpha;
+    eval = alpha;
     if (prevColor !== color) {
         eval = -beta;
     }
@@ -419,6 +420,7 @@ function search(currentBoard, depth, prevColor, alpha, beta) {
         }
         return eval;
     }
+    
     let movable = listMovable(currentBoard);
     if (depth > 3) {
         let evals = {};
@@ -486,7 +488,7 @@ function search(currentBoard, depth, prevColor, alpha, beta) {
         eval *= -1;
     }
     return eval;
-}*/
+}
 
 const defaultDepth = 8;
 const endgameDepth = 14;
