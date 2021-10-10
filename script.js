@@ -357,8 +357,8 @@ function evalLine(newBoard, line) {
     if (color==1){return 0;}
     if (color%6 == 0){return 0;}
     //if (ret == 15){ret=10000;}
-    if (color%2 == 0){return ret;}
-    return -ret
+    if (color%3 == 0){ret*=-1;}
+    return ret*10+Math.random()
 }
 
 // 黒番から見た評価値
@@ -390,9 +390,10 @@ function moveByAI(depth) {
     for (const idx of movable) {
         let tt = board.slice();
         tt[idx]=white
-        let temp_eval=evalBoard(tt)
-        //let temp_eval = search(afterMove(tt, idx), 0, black, 100000, -1000000)
-        console.log(idx, temp_eval)
+        tt[teban]=black
+        //let temp_eval=evalBoard(tt)
+        let temp_eval = search(tt, 1, 1)
+        //console.log(idx, temp_eval)
         if (ret_idx ==-1 || ret_eval < temp_eval){
             ret_idx=idx;
             ret_eval=temp_eval;
@@ -403,95 +404,37 @@ function moveByAI(depth) {
 
 
 // 前の着手から見た評価値、α以下もしくはβ以上が確定したら枝刈り
-function search(currentBoard, depth, prevColor, alpha, beta) {
-    console.log(currentBoard[0])
-    let eval = evalBoard(currentBoard);
-    return eval;
-    
-    const color = getColor(currentBoard);
-    eval = alpha;
-    if (prevColor !== color) {
-        eval = -beta;
-    }
-    if (depth <= 0 || color === end) {
-        eval = evalBoard(currentBoard);
-        if (prevColor === white) {
-            eval *= -1;
-        }
-        return eval;
+function search(currentBoard, depth, fugou) {
+    if (depth==0){
+        console.log(currentBoard[0])
+        let eval = evalBoard(currentBoard);
+        return fugou*eval;
     }
     
-    let movable = listMovable(currentBoard);
-    if (depth > 3) {
-        let evals = {};
-        for (const idx of movable) {
-            evals[idx] = search(afterMove(currentBoard, idx), 0, color, -64000, 64000);
-        }
-        movable.sort(function (a, b) {
-            return evals[b] - evals[a];
-        });
-    }
-    let first = true;
+    let movable = listMovable(board);
+    let ret_idx = -1;
+    let ret_eval= 0;
     for (const idx of movable) {
-        const newBoard = afterMove(currentBoard, idx);
-        let newAlpha = alpha, newBeta = alpha + 1;
-        if (prevColor !== color) {
-            newAlpha = -beta;
-            newBeta = -beta + 1;
+        let tt = currentBoard.slice();
+        tt[idx]=black;//tt[teban]
+        //if (tt[teban]==white){
+        //    tt[teban]=black;
+        //}else{
+        //    tt[teban]=white;
+        //}
+        let temp_eval = fugou*search(tt, 
+            depth-1, fugou*-1)
+        if (ret_idx ==-1 || ret_eval < temp_eval){
+            ret_idx=idx;
+            ret_eval=temp_eval;
         }
-        if (first) {
-            newBeta = beta;
-            if (prevColor !== color) {
-                newBeta = -alpha;
-            }
-        }
-        let newEval = search(newBoard, depth - 1, color, newAlpha, newBeta);
-        if (newEval > eval) {
-            eval = newEval;
-            if (prevColor === color) {
-                alpha = eval;
-            } else {
-                beta = -eval;
-            }
-            if (alpha >= beta) {
-                break;
-            }
-            if (first) {
-                first = false;
-                continue;
-            }
-            if (eval < newBeta) {
-                continue;
-            }
-            newAlpha = alpha;
-            newBeta = beta;
-            if (prevColor !== color) {
-                newAlpha = -beta;
-                newBeta = -alpha;
-            }
-            newEval = search(newBoard, depth - 1, color, newAlpha, newBeta);
-            if (newEval > eval) {
-                eval = newEval;
-                if (prevColor === color) {
-                    alpha = eval;
-                } else {
-                    beta = -eval;
-                }
-                if (alpha >= beta) {
-                    break;
-                }
-            }
-        }
-        first = false;
     }
-    if (prevColor !== color) {
-        eval *= -1;
-    }
-    return eval;
+    return ret_eval
 }
 
 const defaultDepth = 8;
 const endgameDepth = 14;
+
 
 function human(color) {
     if (color === black) {
