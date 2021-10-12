@@ -252,17 +252,12 @@ function move(idx) {
     if (board[idx] !== empty) return;
     
     let movable = true;
-    
-    
     if (movable) {
         flip(idx);
         
-        document.getElementById('countBlack').textContent = board[black_num];
-        document.getElementById('countWhite').textContent = board[white_num];
         changeColor(board);
         const color = getColor(board);
         if (existsMovable(board)) {
-            document.getElementById('turn').textContent = colorString(color);
         } else {
             changeColor(board);
             if (existsMovable(board)) {
@@ -358,18 +353,15 @@ function evalLine(newBoard, line) {
     if (color%6 == 0){return 0;}
     //if (ret == 15){ret=10000;}
     if (color%3 == 0){ret*=-1;}
-    return ret*10+Math.random()
+    return ret*10//+Math.random()
 }
 
-// 黒番から見た評価値
+// 白番から見た評価値
 function evalBoard(newBoard) {
     const method=2
     //乱数の値を返す。
     if (method==0){
-        min = Math.ceil(0);
-        max = Math.floor(10000);
-        ret = Math.floor(Math.random() * (max - min) + min);
-        return ret
+        return Math.random()
     }
     if (method==1){
         return 0;
@@ -392,7 +384,7 @@ function moveByAI(depth) {
         tt[idx]=white
         tt[teban]=black
         //let temp_eval=evalBoard(tt)
-        let temp_eval = search(tt, 2, -1)
+        let temp_eval = search(tt, 1, -1)
         //console.log(idx, temp_eval)
         if (ret_idx ==-1 || ret_eval < temp_eval){
             ret_idx=idx;
@@ -408,40 +400,39 @@ function opp(color){
 }
 
 // 前の着手から見た評価値、α以下もしくはβ以上が確定したら枝刈り
-function search(currentBoard, depth, fugou) {
+function search(cb, depth, fugou) {
     if (depth==0){
-        console.log(currentBoard[0])
-        let eval = evalBoard(currentBoard);
-        return fugou*eval;
+        //console.log(cb[0])
+        let eval = evalBoard(cb);
+        return eval;
     }
     
-    let is_end = check_is_end(board, opp(currentBoard[teban]))
+    let is_end = check_is_end(cb, white)
     if (is_end.length==4){
-        return 1000000
+        console.log('fff_win',depth)
+        return 99000000
     }
-    is_end = check_is_end(board, (currentBoard[teban]))
+    is_end = check_is_end(cb, black)
     if (is_end.length==4){
-        return -1000000
+        console.log('fff_loss',depth)
+        return -99000000
     }
     
-    let movable = listMovable(board);
+    let movable = listMovable(cb);
     let ret_idx = -1;
     let ret_eval= 0;
     for (const idx of movable) {
-        let tt = currentBoard.slice();
-        tt[idx]=tt[teban]
-        if (tt[teban]==white){
-            tt[teban]=black;
-        }else{
-            tt[teban]=white;
-        }
-        let temp_eval = fugou*search(tt, 
-            depth-1, fugou*-1)
-        if (ret_idx ==-1 || ret_eval < temp_eval){
+        let nb = cb.slice();
+        nb[idx] = nb[teban]
+        nb[teban] = opp(nb[teban])
+        let temp_eval = search(nb, depth-1, fugou*-1)
+        //console.log('t', ret_eval, temp_eval)
+        if (ret_idx ==-1 || fugou*ret_eval < fugou*temp_eval){
             ret_idx=idx;
             ret_eval=temp_eval;
         }
     }
+    //console.log('f',depth,ret_eval)
     return ret_eval
 }
 
