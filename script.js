@@ -1,3 +1,6 @@
+const version = '1.0.0'
+document.getElementById('version').textContent = version
+
 const black = 1, white = -1, empty = 0, wall = 2, end = 0;
 
 const bord_full = 64;
@@ -426,13 +429,13 @@ function search(cb, depth, fugou) {
         nb[idx] = nb[teban]
         nb[teban] = opp(nb[teban])
         let temp_eval = search(nb, depth-1, fugou*-1)
-        //console.log('t', ret_eval, temp_eval)
+        //console.log('t',ret_eval,temp_eval)
         if (ret_idx ==-1 || fugou*ret_eval < fugou*temp_eval){
             ret_idx=idx;
             ret_eval=temp_eval;
         }
     }
-    //console.log('f',depth,ret_eval)
+    console.log('fff',depth,ret_eval)
     return ret_eval
 }
 
