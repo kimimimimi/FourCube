@@ -53,8 +53,6 @@ board.push(black);
 board.push(0);
 board.push(0);
 
-const directions = [-10, -9, -8, -1, 1, 8, 9, 10];
-
 // 手番の色を取得
 function getColor(newBoard) {
     return newBoard[teban];
@@ -129,6 +127,7 @@ function existsMovable(newBoard) {
     }
     return false;
 }
+
 
 function check_1d(board, color,d1,d2,d3,ret) {
     for(let i = 0; i < 4; i++){
@@ -251,6 +250,7 @@ function after_end(ret,board){
 
 // 着手
 function move(idx) {
+    document.getElementById('turn').textContent += (idx+16).toString(16);
     const color = getColor(board);
     if (board[idx] !== empty) return;
     
@@ -374,7 +374,7 @@ function evalBoard(newBoard) {
     for (let line of check_list){
         ret += evalLine(newBoard,line)
     }
-    return ret
+    return ret+Math.random()
 
 }
 
@@ -387,7 +387,7 @@ function moveByAI(depth) {
         tt[idx]=white
         tt[teban]=black
         //let temp_eval=evalBoard(tt)
-        let temp_eval = search(tt, 1, -1)
+        let temp_eval = search(tt, 2, -1)
         //console.log(idx, temp_eval)
         if (ret_idx ==-1 || ret_eval < temp_eval){
             ret_idx=idx;
@@ -435,7 +435,7 @@ function search(cb, depth, fugou) {
             ret_eval=temp_eval;
         }
     }
-    console.log('fff',depth,ret_eval)
+    //console.log('fff',depth,ret_eval)
     return ret_eval
 }
 
@@ -454,3 +454,4 @@ function human(color) {
 if (getColor(board) !== end && !human(getColor(board))) {
     move(moveByAI(defaultDepth));
 }
+
