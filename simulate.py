@@ -150,7 +150,47 @@ def min_max(board, depth, fugou, color, next_color):
 			h_max = v
 			h_i = i
 	return h_max
+
+def playout(board, color):
+	n_empty=sum([1 for c in board if c==empty])
+	cc=color
+	pos_list=[]
+	while n_empty>0:
+		c,i = check_clitical(board, cc)
+		if c:
+			ret=i
+		else:
+			ret = random.choice([i for i,c in enumerate(board) if c== empty])
+		board[ret] = cc
+		if cc==color:
+			pos_list.append(ret)
+		if is_end(board):
+			return cc, pos_list
+		cc*=-1
+		n_empty-=1
 	
+	return empty, pos_list
+	
+def mcts2(board,color, *, time_limit=2):
+	st=time.time()
+	score=[[0,1] for c in board]
+	
+	n_try=0
+	while time.time() - st < time_limit:
+		n_try+=1
+		winner, pos_list=playout(board[:],color)
+		add = 0
+		if winner == empty:
+			add=0.5
+		elif winner == color:
+			add=1
+		for p in pos_list:
+			score[p][1]+=1
+			score[p][0]+=add
+	print(n_try)
+	ret = max(range(board_size), key=lambda i : score[i][0]/score[i][1])
+	return ret
+
 def mcts(board,color, *, time_limit=2):
 	st=time.time()
 	score=[[0 if c!=empty else 1,2] for c in board]
@@ -199,8 +239,7 @@ def mcts(board,color, *, time_limit=2):
 	ret = max(range(board_size), key=lambda i : score[i][0]/score[i][1])
 	return ret
 
-def chech_clitical(board, color):
-	
+def check_clitical(board, color):
 	for di in range(board_size):
 		if board[di]!=empty:
 			continue
@@ -241,19 +280,19 @@ def chech_clitical(board, color):
 
 def white_method(board):
 	#return rand(board)
-	c,i = chech_clitical(board, white)
+	c,i = check_clitical(board, white)
 	if c:
 		return i
 	#return rand(board)
 	#return mcts(board, white, time_limit=4)
-	return heuristic_mm(board, white,depth=2)
+	return heuristic_mm(board, white,depth=1)
 
 def black_method(board):
-	c,i = chech_clitical(board, black)
+	c,i = check_clitical(board, black)
 	if c:
 		return i
 	#return rand(board)
-	return mcts(board, black, time_limit=4)
+	return mcts2(board, black, time_limit=2)
 	#return heuristic_mm(board, black,depth=1)
 
 def test():
@@ -272,10 +311,10 @@ def test():
 			ppp.append(pos+10)
 			print('pos white', pos)
 		
-		showeboard(board,lambda v:v+1)
-		print('+++++++++')
+		#showeboard(board,lambda v:v+1)
+		#print('+++++++++')
 		winner = is_end(board)
-		print('ww',winner)
+		#print('ww',winner)
 		if winner != empty:
 			#print('winner is ', int_to_name[winner])
 			return winner, ''.join([str(p) for p in ppp])
@@ -284,9 +323,10 @@ def test():
 		return 0, ''.join([str(p) for p in ppp])
 		
 def showeboard(board, ff):
+	print('+++++++++++++')
 	for i in range(16):
 		print([ff(v) for v in board[i*4:i*4+4]])
-		if i%4==3:
+		if i%4==3 and i!=15:
 			print('____')
 		
 
